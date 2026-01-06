@@ -1,0 +1,25 @@
+# dependencies (aka things this code needs to not explode)
+
+# Core ML (the heavy hitters)
+torch>=2.1.0
+transformers>=4.36.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+
+# Data and evaluation (the useful ones)
+numpy>=1.24.0
+pandas>=2.0.0
+Levenshtein>=0.21.0
+
+# Statistics (for the p-values)
+scipy>=1.11.0
+statsmodels>=0.14.0
+pingouin>=0.5.3
+
+# Visualisation (making things pretty)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities (the glue)
+tqdm>=4.65.0
+pyyaml>=6.0
