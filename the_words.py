@@ -79,3 +79,18 @@ class BigGenerator:
         self.rng = R.Random(seed)
         self._cache = {}
         self.call_count = 0
+
+    def _do_tense(self, v, t):
+        return (v[:-2] + 'is') if t == 'past' else (v[:-2] + 'os') if t == 'future' else v
+
+    def _eng_v(self, ev, t):
+        self.call_count += 1
+        if t == 'past':
+            return _PAST.get(ev, ev + 'ed')
+        elif t == 'future':
+            return 'will ' + ev.rstrip('s')
+        else:
+            return ev
+
+    def _case(self, s, o):
+        return s + self.NOM, o + self.ACC
