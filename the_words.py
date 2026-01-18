@@ -94,3 +94,23 @@ class BigGenerator:
 
     def _case(self, s, o):
         return s + self.NOM, o + self.ACC
+
+    def _build_t(self, s, v, o, t='present'):
+        vv = self._do_tense(v, t)
+        sn, oa = self._case(s, o)
+        return {
+            'v1': s + ' ' + vv + ' ' + o,
+            'v2': vv + ' ' + s + ' ' + o,
+            'v3': sn + ' ' + vv + ' ' + oa,
+            'v4': vv + ' ' + sn + ' ' + oa,
+        }
+
+    def _build_i(self, s, v, t='present'):
+        vv = self._do_tense(v, t)
+        sn = s + self.NOM
+        r = {}
+        r['v1'] = f'{s} {vv}'
+        r['v2'] = f'{vv} {s}'
+        r['v3'] = f'{sn} {vv}'
+        r['v4'] = f'{vv} {sn}'
+        return r
