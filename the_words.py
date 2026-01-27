@@ -213,3 +213,50 @@ class BigGenerator:
 
         return ss
 
+    def generate_few_shot_examples(self, variant, n=8):
+        _init_words()
+        ee = []
+        nn = list(WORDS['n'].keys())
+        vv = list(WORDS['v'].keys())
+        nt = min(n, max(n - 3, 1))
+        ni = min(2, n - nt)
+        nddd = n - nt - ni
+
+        for i in range(nt):
+            _s, _v, _o = nn[i % len(nn)], vv[i % len(vv)], nn[(i + 3) % len(nn)]
+            _eng = f'the {WORDS["n"][_s]} {WORDS["v"][_v]} the {WORDS["n"][_o]}'
+            _vars = self._build_t(f'la {_s}', _v, f'la {_o}')
+            ee.append({'english': _eng, 'translation': _vars[variant]})
+
+        for i in range(ni):
+            _s, _v = nn[(i + 10) % len(nn)], vv[(i + 8) % len(vv)]
+            _eng = f'the {WORDS["n"][_s]} {WORDS["v"][_v]}'
+            _vars = self._build_i(f'la {_s}', _v)
+            ee.append({'english': _eng, 'translation': _vars[variant]})
+
+        for i in range(nddd):
+            _s = nn[(i + 12) % len(nn)]
+            _v = vv[(i + 10) % len(vv)]
+            _io = nn[(i + 13) % len(nn)]
+            _do = nn[(i + 14) % len(nn)]
+            _eng = f'the {WORDS["n"][_s]} {WORDS["v"][_v]} to the {WORDS["n"][_io]} the {WORDS["n"][_do]}'
+            _vars = self._build_d(f'la {_s}', _v, f'al la {_io}', f'la {_do}')
+            ee.append({'english': _eng, 'translation': _vars[variant]})
+
+        return ee
+
+    def save_dataset(self, path='data/test_set.json'):
+        ss = self.generate_test_set()
+        P(path).parent.mkdir(parents=True, exist_ok=True)
+        d = []
+        for s in ss:
+            d.append(vars(s))
+        with open(path, 'w') as f:
+            J.dump(d, f, indent=2, ensure_ascii=False)
+        print(f'Saved {len(d)} sentences to {path}')
+        return ss
+
+
+if __name__ == '__main__':
+    g = BigGenerator(seed=_MAGIC)
+    g.save_dataset()
