@@ -85,3 +85,19 @@ class Brain:
         result = raw.strip().split('\n')[0].strip()
         return result
 
+    def generate_batch(self, prompts):
+        out = []
+        for p in prompts:
+            out.append(self.generate(p))
+        return out
+
+    def get_vram_usage(self):
+        try:
+            if T.cuda.is_available():
+                a = T.cuda.memory_allocated()
+                b = T.cuda.get_device_properties(0).total_memory
+                return str(round(a / 1000000000, 1)) + ' / ' + str(round(b / 1000000000, 1)) + ' GB'
+            else:
+                return 'CUDA not available'
+        except Exception:
+            return 'idk something went wrong'
