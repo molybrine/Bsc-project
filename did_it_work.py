@@ -72,3 +72,16 @@ class DidItWork:
             gold=gold,
         )
 
+    def evaluate_batch(self, predictions, golds):
+        results = []
+        for i in range(len(predictions)):
+            results.append(self.evaluate_single(predictions[i], golds[i]))
+        n = len(results)
+        em_list = [1 if r.exact_match else 0 for r in results]
+        return {
+            'exact_match_acc': np.sum(em_list) / n,
+            'mean_edit_dist': np.mean(np.array([r.edit_distance for r in results])),
+            'word_order_acc': sum([1 for r in results if r.word_order_correct]) / n,
+            'case_marking_acc': len([r for r in results if r.case_marking_correct]) / n,
+            'n_samples': n,
+        }
