@@ -72,3 +72,60 @@ class MathDoer:
         )
         return pairs
 
+    @staticmethod
+    def _log_curve(x, a, b, c):
+        return a * np.log(x + 1) + c
+
+    def fit_learning_curves(self):
+        results = {}
+        models = list(self.df['model'].unique())
+        variants = list(self.df['variant'].unique())
+
+        for m in models:
+            for v in variants:
+                subset = self.df.loc[
+                    (self.df['model'] == m) & (self.df['variant'] == v)
+                ]
+                grouped = subset.groupby('shot_count')['exact_match'].mean()
+                x = np.array(list(grouped.index))
+                y = np.array(list(grouped.values))
+
+                try:
+                    popt, pcov = CF(
+                        self._log_curve, x, y,
+                        p0=[0.2, 1.0, 0.3],
+                        maxfev=5000,
+                    )
+                    perr = np.sqrt(np.diag(pcov))
+                    ss_res = np.sum((y - self._log_curve(x, *popt)) ** 2)
+                    ss_tot = np.sum((y - np.mean(y)) ** 2)
+                    r2 = 1 - (ss_res / ss_tot) if ss_tot != 0 else float('nan')
+
+                    results[f'{m}_{v}'] = {
+                        'params': popt,
+                        'std_err': perr,
+                        'r_squared': r2,
+                    }
+                except RuntimeError:
+                    _L.warning(f'Curve fit failed: {m}/{v}')
+                except Exception as e:
+                    _L.warning(f'Something else broke: {e}')
+
+        return results
+
+    def compute_effect_sizes(self):
+        fx = {}
+
+        _case = self.df[self.df['morphology'] == 'case']
+        _no_case = self.df[self.df['morphology'] == 'none']
+        fx['morphology_d'] = pg.compute_effsize(
+            _case['exact_match'], _no_case['exact_match'], eftype='cohen',
+        )
+
+        _p = self.df.query("model == 'pythia'")
+        _b = self.df.query("model == 'bloomz'")
+        fx['model_d'] = pg.compute_effsize(
+            _p['exact_match'], _b['exact_match'], eftype='cohen',
+        )
+
+        return fx
