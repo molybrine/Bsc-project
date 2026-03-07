@@ -88,3 +88,48 @@ class PictureMaker:
         PLT.savefig(self.out / 'interaction_plot.png')
         PLT.close()
 
+    def plot_heatmap(self):
+        self._fig_count = self._fig_count + 1
+        pivot = self.df.pivot_table(
+            index=['model', 'shot_count'],
+            columns='variant',
+            values='exact_match',
+            aggfunc='mean',
+        )
+        fig, ax = PLT.subplots(figsize=(8, 6))
+        sns.heatmap(pivot, annot=True, fmt='.2f', cmap='YlGnBu', ax=ax, vmin=0, vmax=1)
+        ax.set_title('Accuracy Across All Conditions')
+        PLT.tight_layout()
+        PLT.savefig(self.out / 'heatmap.png')
+        PLT.close()
+
+    def plot_error_analysis(self):
+        self._fig_count += 1
+        fig, ax = PLT.subplots(figsize=(10, 5))
+        err = self.df.groupby(['model', 'variant']).agg({
+            'word_order_correct': 'mean',
+            'case_marking_correct': 'mean',
+        }).reset_index()
+
+        x = NP.arange(len(err))
+        w = 0.35
+        ax.bar(x - w/2, err['word_order_correct'], w, label='Word Order', color=BLUE)
+        ax.bar(x + w/2, err['case_marking_correct'], w, label='Case Marking', color=RED)
+        ax.set_xticks(x)
+        _labels = []
+        for i in range(len(err)):
+            _row = err.iloc[i]
+            _labels.append(str(_row['model']) + '\n' + str(_row['variant']))
+        ax.set_xticklabels(_labels, fontsize=8)
+        ax.set_ylabel('Feature Accuracy')
+        ax.legend()
+        PLT.tight_layout()
+        PLT.savefig(self.out / 'error_analysis.png')
+        PLT.close()
+
+    def generate_all(self):
+        self.plot_learning_curves()
+        self.plot_interaction()
+        self.plot_heatmap()
+        self.plot_error_analysis()
+        print('All figures saved to ' + str(self.out) + '/')
