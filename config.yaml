@@ -30,3 +30,4 @@ generation:
 statistics:
   alpha: 0.05
   bonferroni_comparisons: 6
+
