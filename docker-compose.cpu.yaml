@@ -1,0 +1,13 @@
+services:
+  experiment:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    volumes:
+      - ~/llm-models:/models
+      - ~/llm-results:/results
+      - ./data:/app/data
+    environment:
+      - RESULTS_DIR=/results
+      - HF_HOME=/models
+      - TRANSFORMERS_CACHE=/models

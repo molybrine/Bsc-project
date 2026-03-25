@@ -14,14 +14,40 @@ _M['bloomz'] = ('bigscience/bloomz-7b1', 'instruction', 64)
 _M['smol'] = ('EleutherAI/pythia-70m', 'base', 32)
 
 
+def _pick_device():
+    if T.cuda.is_available():
+        _L.info('Found NVIDIA GPU, using CUDA')
+        return 'cuda'
+    try:
+        if hasattr(T, 'hip') or T.version.hip:
+            _L.info('Found AMD GPU, using ROCm')
+            return 'cuda'
+    except Exception:
+        pass
+    try:
+        if hasattr(T.backends, 'mps') and T.backends.mps.is_available():
+            _L.info('Found Apple GPU, using MPS')
+            return 'mps'
+    except Exception:
+        pass
+    _L.info('No GPU found, falling back to CPU (this will be slow)')
+    return 'cpu'
+
+
 class Brain:
 
-    def __init__(self, mk, quantize='8bit', device='cuda'):
+    def __init__(self, mk, quantize='8bit', device=None):
         _cfg = _M[mk]
         self.model_name = _cfg[0]
         self.model_type = _cfg[1]
         self.max_new_tokens = _cfg[2]
         self._total_generated = 0
+
+        detected = _pick_device() if device is None else device
+
+        if detected == 'cpu' and quantize != 'none':
+            _L.warning('No GPU detected, forcing quantize=none for CPU')
+            quantize = 'none'
 
         qc = None
         if quantize == '8bit':
@@ -37,7 +63,7 @@ class Brain:
         if quantize == 'none':
             self.device = 'cpu'
         else:
-            self.device = device
+            self.device = detected
 
         _L.info(f'Loading {self.model_name} ({quantize} quantisation)...')
 

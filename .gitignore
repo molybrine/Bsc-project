@@ -1,4 +1,3 @@
-# things git should ignore (like my bad code)
 __pycache__/
 *.pyc
 *.pyo
