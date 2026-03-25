@@ -81,6 +81,7 @@ class Brain:
                 self.model_name,
                 quantization_config=qc,
                 device_map='auto',
+                max_memory={0: '10GiB', 'cpu': '16GiB'},
             )
         self.model.eval()
         _L.info('Model loaded successfully. probably.')
