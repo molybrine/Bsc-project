@@ -1,3 +1,6 @@
+# Experiment configuration
+# -----------------------
+
 experiment:
   name: 'llm_grammar_factorial'
   seed: 42
@@ -6,7 +9,7 @@ experiment:
 models:
   - key: pythia
     name: EleutherAI/pythia-6.9b
-    quantize: 8bit
+    quantize: 8bit           # 8bit or 4bit
   - key: bloomz
     name: bigscience/bloomz-7b1
     quantize: 8bit
@@ -19,7 +22,7 @@ data:
   n_transitive: 20
   n_intransitive: 20
   n_ditransitive: 20
-  n_adjective: 10
+  n_adjective: 10            # Total: 70
 
 generation:
   max_new_tokens: 64
@@ -30,4 +33,3 @@ generation:
 statistics:
   alpha: 0.05
   bonferroni_comparisons: 6
-

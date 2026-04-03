@@ -1,11 +1,41 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
-results/*.csv
-figures/*.png
-.env
+.eggs/
 *.egg-info/
 dist/
 build/
+
+# Virtual environment
+llm_grammar_env/
 venv/
 .venv/
+
+# Model cache (can be several GB)
+.cache/
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# Results and figures (regenerated)
+results/*.csv
+figures/*.png
+
+# Environment variables
+.env
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
