@@ -44,10 +44,7 @@ def run_quick_test(model_key: str, quantize: str = '8bit'):
         for i, sent in enumerate(test_set):
             gold = getattr(sent, variant)
 
-            if model.model_type == 'instruction':
-                prompt = builder.build_chat_prompt(sent.english)
-            else:
-                prompt = builder.build_prompt(sent.english)
+            prompt = builder.build_prompt(sent.english)
 
             prediction = model.generate(prompt)
 

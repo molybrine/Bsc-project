@@ -95,19 +95,11 @@ def run_experiment(model_key: str, quantize: str = '8bit'):
                 tqdm(test_set,
                      desc=f'{variant}/{n_shots}-shot')
             ):
-                # Build prompt based on model type
-                if model.model_type == 'instruction':
-                    prompt = builder.build_chat_prompt(
-                        sent.english,
-                        examples if n_shots > 0
-                        else None,
-                    )
-                else:
-                    prompt = builder.build_prompt(
-                        sent.english,
-                        examples if n_shots > 0
-                        else None,
-                    )
+                prompt = builder.build_prompt(
+                    sent.english,
+                    examples if n_shots > 0
+                    else None,
+                )
                 prediction = model.generate(prompt)
                 gold = getattr(sent, variant)
                 result = evaluator.evaluate_single(
