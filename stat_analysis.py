@@ -52,27 +52,44 @@ class StatisticalAnalyser:
         2x2 mixed ANOVA: syntax x morphology (within)
         x model (between).
         Tests H2 (feature difficulty and interaction).
+        Falls back to rm_anova if only one model is present.
         """
-        aov = pg.mixed_anova(
-            data=self.df,
-            dv='exact_match',
-            within=['syntax', 'morphology'],
-            between='model',
-            subject='subject_id',
-        )
+        models = self.df['model'].unique()
+        if len(models) >= 2:
+            aov = pg.mixed_anova(
+                data=self.df,
+                dv='exact_match',
+                within=['syntax', 'morphology'],
+                between='model',
+                subject='subject_id',
+            )
+        else:
+            logger.info(
+                'Only one model — running repeated-measures '
+                'ANOVA (no between factor)'
+            )
+            aov = pg.rm_anova(
+                data=self.df,
+                dv='exact_match',
+                within=['syntax', 'morphology'],
+                subject='subject_id',
+            )
         logger.info('Factorial ANOVA results:')
         logger.info(f'\n{aov.to_string()}')
+
+        def _is_sig(source_name):
+            row = aov.loc[aov['Source'] == source_name]
+            if row.empty:
+                return False
+            return row['p-unc'].values[0] < self.ALPHA
+
         return {
             'anova_table': aov,
-            'syntax_sig': aov.loc[
-                aov['Source'] == 'syntax',
-                'p-unc'].values[0] < self.ALPHA,
-            'morphology_sig': aov.loc[
-                aov['Source'] == 'morphology',
-                'p-unc'].values[0] < self.ALPHA,
-            'interaction_sig': aov.loc[
-                aov['Source'] == 'syntax * morphology',
-                'p-unc'].values[0] < self.ALPHA,
+            'syntax_sig': _is_sig('syntax'),
+            'morphology_sig': _is_sig('morphology'),
+            'interaction_sig': _is_sig(
+                'syntax * morphology'
+            ),
         }
 
     def post_hoc_tests(self) -> pd.DataFrame:
@@ -141,12 +158,20 @@ class StatisticalAnalyser:
             no_case['exact_match'],
             eftype='cohen',
         )
-        # Pythia vs BLOOMZ
-        pythia = self.df[self.df['model'] == 'pythia']
-        bloomz = self.df[self.df['model'] == 'bloomz']
-        effects['model_d'] = pg.compute_effsize(
-            pythia['exact_match'],
-            bloomz['exact_match'],
-            eftype='cohen',
-        )
+        # Between-model comparison (only if 2+ models)
+        models = self.df['model'].unique()
+        if len(models) >= 2:
+            m1 = self.df[self.df['model'] == models[0]]
+            m2 = self.df[self.df['model'] == models[1]]
+            effects['model_d'] = pg.compute_effsize(
+                m1['exact_match'],
+                m2['exact_match'],
+                eftype='cohen',
+            )
+        else:
+            logger.info(
+                'Only one model — skipping between-model '
+                'effect size'
+            )
+            effects['model_d'] = None
         return effects

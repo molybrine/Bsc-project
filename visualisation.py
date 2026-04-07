@@ -42,18 +42,35 @@ class Visualiser:
         results_df: pd.DataFrame,
         output_dir: str = 'figures/',
     ):
-        self.df = results_df
+        self.df = results_df.copy()
         self.out = Path(output_dir)
         self.out.mkdir(parents=True, exist_ok=True)
+
+        # Add factor columns if not already present
+        if 'syntax' not in self.df.columns:
+            self.df['syntax'] = self.df['variant'].map({
+                'v1': 'SVO', 'v2': 'VSO',
+                'v3': 'SVO', 'v4': 'VSO',
+            })
+        if 'morphology' not in self.df.columns:
+            self.df['morphology'] = self.df['variant'].map({
+                'v1': 'none', 'v2': 'none',
+                'v3': 'case', 'v4': 'case',
+            })
 
     def plot_learning_curves(self):
         """
         Figure 1: Exact-match accuracy vs shot count
         for each model, with 95% CI bands.
         """
-        fig, axes = plt.subplots(1, 2, figsize=(12, 5),
-                                 sharey=True)
-        for ax, model in zip(axes, ['pythia', 'bloomz']):
+        models = sorted(self.df['model'].unique())
+        n = len(models)
+        fig, axes = plt.subplots(
+            1, max(n, 1), figsize=(6 * max(n, 1), 5),
+            sharey=True, squeeze=False,
+        )
+        axes = axes[0]  # flatten to 1D
+        for ax, model in zip(axes, models):
             sub = self.df[self.df['model'] == model]
             for variant in ['v1', 'v2', 'v3', 'v4']:
                 v_data = sub[sub['variant'] == variant]
