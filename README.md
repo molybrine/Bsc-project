@@ -146,8 +146,8 @@ Once both models have been run:
 
 ```bash
 python merge_and_analyse.py \
-    --pythia results/results_pythia_<timestamp>.csv \
-    --bloomz results/results_bloomz_<timestamp>.csv
+    --model1 results/results_pythia_<timestamp>.csv \
+    --model2 results/results_bloomz_<timestamp>.csv
 ```
 
 This produces:
@@ -159,23 +159,30 @@ This produces:
 
 ## Pipeline Overview
 
-```
-Language Generation ──> Prompt Construction ──> Model Inference
-  (70 sentences,          (840 prompts per       (quantized,
-   4 variants each)        model)                 greedy decoding)
-        │                                              │
-        │                                              v
-        │                                         Evaluation
-        │                                    (exact match, edit dist,
-        │                                     word order, case marking)
-        │                                              │
-        v                                              v
-  verify_dataset.py                          results_{model}.csv
-                                                       │
-                                                       v
-                                              merge_and_analyse.py
-                                             (ANOVA, effect sizes,
-                                              learning curves, figures)
+```mermaid
+flowchart TD
+    A[language_generator.py<br/>70 sentences x 4 variants] -->|test_set.json| B[verify_dataset.py<br/>sanity checks]
+    B --> C[run_experiment.py]
+    C --> D[prompt_builder.py<br/>840 prompts per model]
+    D --> E[model_inference.py<br/>quantised, greedy decoding]
+    E --> F[evaluation.py<br/>exact match, edit distance,<br/>word order, case marking]
+    F -->|results_MODEL_QUANTIZE_TIMESTAMP.csv| G[merge_and_analyse.py]
+    G --> H[stat_analysis.py<br/>ANOVA, effect sizes,<br/>learning curves]
+    G --> I[visualisation.py<br/>4 publication figures]
+    H --> J[stdout: p-values,<br/>Cohen's d, R squared]
+    I --> K[figures/*.png]
+
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#fff4e1
+    style D fill:#fff4e1
+    style E fill:#fff4e1
+    style F fill:#fff4e1
+    style G fill:#f0e1ff
+    style H fill:#f0e1ff
+    style I fill:#f0e1ff
+    style J fill:#e1ffe1
+    style K fill:#e1ffe1
 ```
 
 ## Evaluation Metrics
