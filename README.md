@@ -237,4 +237,4 @@ exact_match, edit_distance, word_order_correct, case_marking_correct
 
 ## License
 
-BSc Dissertation Research Project.
+MIT
