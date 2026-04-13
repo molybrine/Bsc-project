@@ -116,11 +116,23 @@ class ModelInference:
             )
             self.model.to(self.device)
         else:
+            # Auto-detect VRAM and use ~85% for model,
+            # overflow the rest to CPU RAM
+            total_vram = torch.cuda.get_device_properties(
+                0
+            ).total_memory / (1024 ** 3)
+            gpu_budget = f'{int(total_vram * 0.85)}GiB'
+            logger.info(
+                f'VRAM detected: {total_vram:.1f} GB '
+                f'— reserving {gpu_budget} for model'
+            )
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
                 quantization_config=quant_config,
                 device_map='auto',
-                max_memory={0: '8GiB', 'cpu': '16GiB'},
+                max_memory={
+                    0: gpu_budget, 'cpu': '16GiB'
+                },
             )
         self.model.eval()
         logger.info('Model loaded successfully.')

@@ -26,7 +26,14 @@ class StatisticalAnalyser:
                 exact_match, edit_distance,
                 word_order_correct, case_marking_correct
         """
-        self.df = results_df
+        self.df = results_df.copy()
+        # Ensure numeric types for DV columns
+        # (bool/object dtypes break pingouin ANOVA)
+        for col in ('exact_match', 'edit_distance',
+                     'word_order_correct',
+                     'case_marking_correct'):
+            if col in self.df.columns:
+                self.df[col] = self.df[col].astype(float)
         self._add_factor_columns()
 
     def _add_factor_columns(self):
