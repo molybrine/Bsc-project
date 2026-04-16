@@ -5,7 +5,6 @@ Factorial ANOVA, post-hoc tests, and learning curve regression.
 import numpy as np
 import pandas as pd
 import pingouin as pg
-from scipy import stats
 from scipy.optimize import curve_fit
 from typing import Dict, Tuple, Optional
 import logging

@@ -4,7 +4,7 @@ Implements exact match, edit distance, and feature-level accuracy.
 """
 import Levenshtein
 import numpy as np
-from typing import List, Dict, Tuple
+from typing import List, Dict
 from dataclasses import dataclass
 
 

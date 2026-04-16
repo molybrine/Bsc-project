@@ -19,7 +19,7 @@ from pathlib import Path
 from tqdm import tqdm
 from datetime import datetime
 
-from language_generator import LanguageGenerator
+from language_generator import LanguageGenerator, Sentence
 from prompt_builder import PromptBuilder
 from model_inference import ModelInference
 from evaluation import Evaluator
@@ -54,7 +54,7 @@ def run_experiment(model_key: str, quantize: str = '8bit'):
         )
         with open(data_path) as f:
             raw = json.load(f)
-        test_set = gen.generate_test_set()
+        test_set = [Sentence(**s) for s in raw]
     else:
         logger.info('Generating test data...')
         test_set = gen.save_dataset()

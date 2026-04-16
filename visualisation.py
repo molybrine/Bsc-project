@@ -8,7 +8,6 @@ import seaborn as sns
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from typing import Dict, Optional
 
 
 # Consistent style
@@ -20,11 +19,6 @@ mpl.rcParams.update({
     'figure.dpi': 150,
     'savefig.dpi': 300,
 })
-
-PALETTE = {
-    'pythia': '#2E86C1',
-    'bloomz': '#E74C3C',
-}
 
 VARIANT_LABELS = {
     'v1': 'V1 (SVO, no case)',

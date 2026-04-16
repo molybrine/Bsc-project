@@ -22,7 +22,7 @@ Each variant is tested under three few-shot conditions (0-shot, 3-shot, 8-shot) 
 ## Project Structure
 
 ```
-llm_grammar_final/
+llm_gramer/
 ├── language_generator.py   # Synthetic language & test set generation
 ├── prompt_builder.py       # Prompt construction for base & instruction models
 ├── model_inference.py      # Quantized model loading & text generation
@@ -65,7 +65,7 @@ The model inference pipeline auto-detects the best available device in this orde
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd llm_grammar_final
+cd llm_gramer
 
 # Create virtual environment
 python -m venv venv

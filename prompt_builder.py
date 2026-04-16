@@ -63,22 +63,3 @@ class PromptBuilder:
         parts.append('Translation:')
         return '\n'.join(parts)
 
-    def build_chat_prompt(
-        self,
-        test_sentence: str,
-        examples: Optional[List[Dict[str, str]]] = None,
-    ) -> str:
-        """Build prompt for instruction-tuned models.
-        Uses plain instruction format matching
-        BLOOMZ training style."""
-        parts = [self.system_msg, '']
-        if examples:
-            for ex in examples:
-                parts.append(
-                    f"Translate: {ex['english']}"
-                )
-                parts.append(ex['translation'])
-                parts.append('')
-        parts.append(f'Translate: {test_sentence}')
-        # Model generates continuation directly
-        return '\n'.join(parts)
