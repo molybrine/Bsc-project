@@ -64,7 +64,7 @@ The model inference pipeline auto-detects the best available device in this orde
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/molybrine/Bsc-project/tree/master
 cd llm_gramer
 
 # Create virtual environment
